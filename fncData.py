@@ -50,6 +50,13 @@ baseDict = {}
 
 
 
+# key fnncid
+# value:list [fncObj1, fncObj2, ...]
+notExDict = {}
+
+# key fnncid
+# value:list [fncObj1, fncObj2, ...]
+conflicExDict = {}
 
 def init(folderpath):
     global baseDict
@@ -59,5 +66,32 @@ def init(folderpath):
     #     for each in fncdict[key]:
     #         each.showInfo()
 
+
+# def baseCheck(id):
+#     if id in
+
+
+# 待校验
+temp2check = (3142,3119,3120
+,3143,3126,3127
+,68873,68508,68509
+,3144,3128,3129
+,3138,3141
+,3130,3134
+,68510,68511
+,3132,3136
+,3139,3140
+,3131,3135
+,68512,68513
+,3133,3137
+,68519,68518
+,68521,68520
+,68514,68515
+,68522,68523
+, 2977
+, 3124
+, 68517
+,3121
+              )
 
 

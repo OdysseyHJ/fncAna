@@ -10,8 +10,10 @@ from hjperf import cTimeBand
 
 
 def main():
-
-
+    # pathlist = fnclib.getPathDepth(setting.fncAll, 1)
+    # fnclib.rename(pathlist)
+    #
+    # return
 
     # 时间打点初始化
     timeBand = cTimeBand()
@@ -21,9 +23,15 @@ def main():
     fncData.init(setting.initPaht)
     timeBand.addTimePoint()
 
+    # 检查id是否在字典中
+    # print(fnclib.checkIDexist(fncData.temp2check))
+
     # 处理原始数据信息,获取站点host信息
-    fileList = fnclib.getPathDepth(setting.oringinDataPath, 2)
+    # fileList = fnclib.getPathDepth(setting.oringinDataPath, 2)
+    fileList = fnclib.getPathDepth(setting.fncAll, 1)
+    # fileListAppend = fnclib.getPathDepth(setting.appendPath)
     timeBand.addTimePoint()
+    # fileList += fileListAppend
 
     # 根据path信息,读取处理数据,处理生产基于host的信息并写文件
     fnclib.genFncStatistciInfo(fileList, setting.statInfoBaseHost)
@@ -33,10 +41,11 @@ def main():
     fnclib.genfnccsv(setting.rootpath)
     timeBand.addTimePoint()
 
+    fnclib.saveNotExtDict(setting.notExInfo)
 
     # 打印处理时间信息
     print(timeBand.getTimeBand())
-
+    return
 
 
 

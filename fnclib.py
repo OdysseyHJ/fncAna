@@ -11,8 +11,9 @@ g_decodeSymbolMap = {
     r'\^s'    :'-',
     r'\^e'    :'=',
     r'\^c'    :',',
-    r'\^r\^n' :r'\r',
-    r'\^n'    :r'\r',
+    r'\^r^n'  :r'\n',
+    r'\^n'    :r'\n',
+    r'\^r'    :r'\n',
     r'\^b'    :'[',
     r'\^B'    :']',
     r'\\t'     :'    ',
@@ -51,7 +52,7 @@ def getFileLib(folderPath):
 
 
 # 获取路径下指定深度的目录路径
-def getPathDepth(folderPath, depth, fullPath = True):
+def getPathDepth(folderPath, depth = 1, fullPath = True):
     rootDepth = len(folderPath.split(os.path.sep))
     pathList = []
     endFlag = False
@@ -220,13 +221,16 @@ def genFncStatistciInfo(fileList, outputPath):
         fncdict = getFncDict(path, pathName)
         errorStat = getErrorStat(fncdict)
         conflictStat = getConflictStat(fncdict)
-        # errorStat.showInfo()
-        # conflictStat.showInfo()
+
+
         errorRatio = getRatioInAll(errorStat.total)
         conflictRatio = getRatioInAll(conflictStat.total)
 
         # gen fncAllmap 暂存
         fncAllmapAddDict(fncdict)
+
+        #针对基准分析 base中缺少的公式：
+        checkDict(fncdict)
 
         strUnit = unitTmp.format(pathName, strStatisInfo, lossRatio, conflictRatio, errorRatio, version)
         strOut += strUnit
@@ -263,9 +267,9 @@ class fncObj:
                        content='None', body='None', directory='None',
                        hostname = 'None'):
         self.id = id
-        self.name = name
+        self.name = name     #公式名
         self.fname = fname   #文件名
-        self.path = path
+        self.path = path     #文件路径
         self.content = content
         self.body = body  #去除公式名字的文件内容
         self.directory = directory  #plugins/free/level2
@@ -319,6 +323,16 @@ def getFncDict(folderPath, hostname = "None"):
 
     return fncDict
 
+def checkIDexist(tup):
+    existedTup = []
+    for id in tup:
+        if id in fncData.baseDict.keys():
+            if len(fncData.baseDict[id]) > 1:
+                print("basedict multiple! cnt=" + len(fncData.baseDict[id]))
+            info = (id, fncData.baseDict[id][0].path)
+            existedTup.append(info)
+    return existedTup
+
 class fncStat:
     fobjlist = []
     def __init__(self, plg = 0, free = 0, lvl2 = 0):
@@ -355,6 +369,8 @@ def getConflictStat(compDict):
     for key in compDict.keys():
         for fobj in compDict[key]:
             # print(key)
+            if key not in fncData.baseDict.keys():
+                continue
             for baseobj in fncData.baseDict[key]:
                 # 目录相同，而且公式体不一样
                 if fobj.directory == baseobj.directory and fobj.body != baseobj.body:
@@ -366,15 +382,72 @@ def getConflictStat(compDict):
                         conflictStat.lvl2 += 1
     return conflictStat.refresh()
 
+def checkDict(tmpdict):
+
+    for value in tmpdict.values():
+        for fncobj in value:
+            fncData.notExDict = fncobjExistCA(fncobj, fncData.baseDict, False, fncData.notExDict)
 
 
+# exist check adn add
+# 返回被修改的字典
+def fncobjExistCA(fncobj, dictA, samedict = True, dictB = {}):
+    key = fncobj.id
+    dictOper = dictA
+    if samedict == False:
+        dictOper = dictB
+
+    if key in dictA.keys():
+        pass
+    else:
+        # dictA中不存在的部分记录到 dictOper中
+        if key in dictOper.keys():
+            dictOper[key].append(fncobj)
+        else:
+            dictOper[key] = [fncobj]
+
+    return dictOper
+
+# conflict check and add
+# 返回被修改的字典
+def fncobjConflictCA(fncobj, dictA, samedict = True, dictB = {}):
+    key = fncobj.id
+    fbody = fncobj.body
+    dictOper = dictA
+    if samedict == False:
+        dictOper = dictB
+
+    if key in dictA.keys():
+        conflictFlag = True
+        for fobj in dictA[key]:
+            if fbody == fobj.body:
+                conflictFlag = False
+                break
+        if conflictFlag:
+            if key in dictOper.keys():
+                dictOper[key].append(fncobj)
+            else:
+                dictOper[key] = [fncobj]
+
+    return dictOper
 
 ###################################################################################
 # 多层字典
 # key: plugins,free,level2
 # value dict --key :fncID
 #            --value: dict --key:body
-#                          --value: list[hostname1, hostname2 ]
+#                          --value: hostobj
+class CHostList:
+    def __init__(self, path, hostname = None):
+        self.path = path
+        self.hostlist = []
+        if hostname != None:
+            self.hostlist = [hostname]
+
+    def append(self, hostname):
+        self.hostlist.append(hostname)
+
+
 g_fncAllmap = {}
 
 def addFncObj(fncobj):
@@ -383,19 +456,20 @@ def addFncObj(fncobj):
     fdir = fncobj.directory
     fbody = fncobj.body
     fhost = fncobj.hostname
+    fpath = fncobj.path
 
     if fdir not in g_fncAllmap.keys():
         body2host = {}
-        body2host[fbody] = [fhost]
+        body2host[fbody] = CHostList(fpath, fhost)
         id2body = {}
         id2body[fid] = body2host
         g_fncAllmap[fdir] = id2body
     elif fid not in g_fncAllmap[fdir].keys():
         body2host = {}
-        body2host[fbody] = [fhost]
+        body2host[fbody] = CHostList(fpath, fhost)
         g_fncAllmap[fdir][fid] = body2host
     elif fbody not in  g_fncAllmap[fdir][fid].keys():
-        g_fncAllmap[fdir][fid][fbody] = [fhost]
+        g_fncAllmap[fdir][fid][fbody] = CHostList(fpath, fhost)
     else:
         g_fncAllmap[fdir][fid][fbody].append(fhost)
 
@@ -419,17 +493,23 @@ def formatfncAllmap(path = None):
         for fid in g_fncAllmap[fdir].keys():
             verTag = 1
             fidContent = ''
+            cmpContent = ''
             for fbody in  g_fncAllmap[fdir][fid].keys():
-                unit = g_fncAllmap[fdir][fid][fbody]
-                unitinfo = unitTmp.format(fdir, fid, fbody, verTag, len(unit))
+                hlobj = g_fncAllmap[fdir][fid][fbody]
+                hnlist = hlobj.hostlist
+                unitinfo = unitTmp.format(fdir, fid, fbody, verTag, len(hnlist))
                 csvinfo += unitinfo
-                fidContent += 'version: {}  Cnt:{}\nfbody: {}\nhostinfo:\n{}\n\n'.format(verTag, len(unit), fbody, '\n'.join(unit))
+                fidContent += 'version: {}  Cnt:{}\nfbody: {}\nhostinfo:\n{}\n\n'.format(verTag, len(hnlist), fbody, '\n'.join(hnlist))
+
+                transBody = fncDecode(fbody)
+                cmpContent += 'version{} Cnt:{} \n{}\ntransfbody:\n{}\n\n'.format(verTag, len(hnlist), hlobj.path, transBody)
+
                 verTag += 1
 
-            fidContent = 'versionCnt:{}\n{}'.format(verTag-1, fidContent)
+            totalContent = 'versionCnt:{}\n{}\n{}'.format(verTag-1, cmpContent, fidContent)
             if path != None:
                 filename = '{}\公式主体统计-{}\{}.txt'.format(path, fdir, fid)
-                hjio.wirteText(fidContent, filename)
+                hjio.wirteText(totalContent, filename)
 
     return csvinfo
 
@@ -438,3 +518,30 @@ def genfnccsv(path):
     filename = "{}\{}".format(path, '公式主体统计.csv')
     hjio.wirteCSV(csvinfo, filename)
     return True
+
+# 路径重命名，取hostname
+def rename(pathlist):
+    for file in pathlist:
+        path = file.rsplit('\\', 1)[0]
+        oldname = file.rsplit('\\', 1)[-1]
+        newname = oldname.rsplit('_', 1)[0]
+        tail = oldname.rsplit('_', 1)[-1]
+        newfile = path + '\\' + newname
+        if tail != 'plugins20210520':
+            print('skip!')
+            continue
+        os.renames(file, newfile)
+        # break
+
+def saveNotExtDict(path):
+    procDict = fncData.notExDict
+    keylist = list(procDict.keys())
+    keylist.sort()
+    strInfo = 'lack Cnt:{}\n'.format(len(keylist))
+    for key in keylist:
+        unitInfo = 'fncid:{}\n'.format(key)
+        for file in procDict[key]:
+            unitInfo += '{}\n'.format(file.path)
+        strInfo += unitInfo
+
+    hjio.wirteText(strInfo, path)
