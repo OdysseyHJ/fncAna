@@ -40,6 +40,7 @@ DIR_FREE = '@free'
 DIR_LEVLE2 = '@level2'
 
 
+
 # 获取目标路径下的文本路径信息
 # return [(current_path, [sub_path_list], [file_list]),(sub_path1, [sub_path_list], [file_list]), ...]
 def getFileLib(folderPath):
@@ -180,7 +181,9 @@ g_statisTabhead = ('Hostname',
                  '站点公式计数'
                  '公式缺失率',
                  '公式冲突率',
+                 '公式冲突数',
                  '公式错误率',
+                 '公式错误数',
                  '公式版本')
 
 
@@ -188,7 +191,7 @@ def genFncStatistciInfo(fileList, outputPath):
     strOut = ','.join(g_statisTabhead) + '\n'
 
     # hostname, (统计信息), 缺失率, 冲突率, 错误率
-    unitTmp = '{},{},{},{},{},{}\n'
+    unitTmp = '{},{},{},{},{},{},{},{}\n'
     index = 1
     dedupFilter = set()
     totaltoProcess = len(fileList)
@@ -230,9 +233,14 @@ def genFncStatistciInfo(fileList, outputPath):
         fncAllmapAddDict(fncdict)
 
         #针对基准分析 base中缺少的公式：
-        checkDict(fncdict)
+        checkDictExist(fncdict)
 
-        strUnit = unitTmp.format(pathName, strStatisInfo, lossRatio, conflictRatio, errorRatio, version)
+        #统计冲突的公式id
+        checkDictConflict(fncdict)
+
+        strUnit = unitTmp.format(pathName, strStatisInfo, lossRatio,
+                                 conflictRatio, conflictStat.total,
+                                 errorRatio, errorStat.total, version)
         strOut += strUnit
 
 
@@ -270,7 +278,7 @@ class fncObj:
         self.name = name     #公式名
         self.fname = fname   #文件名
         self.path = path     #文件路径
-        self.content = content
+        self.content = content #全部公式文件内容
         self.body = body  #去除公式名字的文件内容
         self.directory = directory  #plugins/free/level2
         self.hostname = hostname  #hostname
@@ -382,13 +390,15 @@ def getConflictStat(compDict):
                         conflictStat.lvl2 += 1
     return conflictStat.refresh()
 
-def checkDict(tmpdict):
-
+def checkDictExist(tmpdict):
     for value in tmpdict.values():
         for fncobj in value:
             fncData.notExDict = fncobjExistCA(fncobj, fncData.baseDict, False, fncData.notExDict)
 
-
+def checkDictConflict(tmpdict):
+    for value in tmpdict.values():
+        for fncobj in value:
+            fncData.conflicExDict = fncobjConflictCA(fncobj, fncData.baseDict, False, fncData.conflicExDict)
 # exist check adn add
 # 返回被修改的字典
 def fncobjExistCA(fncobj, dictA, samedict = True, dictB = {}):
@@ -540,8 +550,73 @@ def saveNotExtDict(path):
     strInfo = 'lack Cnt:{}\n'.format(len(keylist))
     for key in keylist:
         unitInfo = 'fncid:{}\n'.format(key)
-        for file in procDict[key]:
-            unitInfo += '{}\n'.format(file.path)
+        dedupdict = {}
+        verTag = 0
+        for fobj in procDict[key]:
+            if fobj.body not in dedupdict.keys():
+                verTag += 1
+                dedupdict[fobj.body] = verTag
+
+            currTag = dedupdict[fobj.body]
+            unitInfo += 'currTag{}  {}\n'.format(currTag, fobj.path)
         strInfo += unitInfo
 
     hjio.wirteText(strInfo, path)
+
+def opPathlist(pathlist):
+    strInfo = ''
+    for path in pathlist:
+        hostname = path.split('\\')[-1]
+        strInfo += '{}\n'.format(hostname)
+
+    file = r'hostlist.csv'
+    hjio.wirteCSV(strInfo, file, True)
+
+def genSetbyfileline(filepath):
+    templist = hjio.readFile(filepath).split('\n')
+    res = set(templist)
+    return res
+
+def compSet(setA, setB):
+    listAB = setA-setB
+    strAB = '\n'.join(listAB)
+    listBA = setB-setA
+    strBA = '\n'.join(listBA)
+    return (strAB, strBA)
+
+def compFilebyLineSet(path1, path2):
+    setA = genSetbyfileline(path1)
+    setB = genSetbyfileline(path2)
+    strdiff = compSet(setA, setB)
+
+    filediffAB = 'host信息\diffAB.txt'
+    filediffBA = 'host信息\diffBA.txt'
+    hjio.wirteCSV(strdiff[0], filediffAB, True)
+    hjio.wirteCSV(strdiff[1], filediffBA, True)
+
+
+
+def genFncDataDict(path):
+    procDict = fncData.baseDict
+    tablehead = 'ID,公式名,周期,市场,目录,其他标签,内容'
+    tablelist = tablehead.split(',')
+    # uintTmp = '{},{},{},{},{},{},{}\n'
+    linelist = [tablelist]
+    keylist = list(procDict.keys())
+    keylist.sort()
+    for key in keylist:
+        for fobj in procDict[key]:
+            fclist = fobj.content.split('\n')[0].split(',')
+            fncID = key
+            fncname = fclist[0]
+            fncperiod = fclist[-1]
+            if len(fclist) < 5:
+                fncperiod = 0
+            fncmarket = 'all'
+            fncdir = fobj.directory
+            fncother = ''
+            fnccontent = fncDecode(fclist[3])
+            lineUnit = [fncID, fncname, fncperiod, fncmarket, fncdir, fncother, fnccontent]
+            linelist.append(lineUnit)
+
+    hjio.writeCsvbyList(linelist, path)

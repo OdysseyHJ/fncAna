@@ -23,7 +23,7 @@ import fnclib
 # @free 公式数
 # @level2 公式数
 # 公式总数 1034
-stdInfo = (878, 85, 71, 1034)
+stdInfo = (894, 85, 71, 1050)
 
 
 
@@ -42,7 +42,10 @@ wrongFncID = (527527, # 1 3 5 10 15 分钟涨幅系列
                 592544,
                 592723,
                 723572,
-                723573)
+                723573,
+                723653,
+
+              )
 
 # key:fncid
 # value:list [fncObj1, fncObj2, ...]
@@ -61,6 +64,7 @@ conflicExDict = {}
 def init(folderpath):
     global baseDict
     baseDict = fnclib.getFncDict(folderpath, 'base')
+    fnclib.fncAllmapAddDict(baseDict)
 
     # for key in fncdict.keys():
     #     for each in fncdict[key]:

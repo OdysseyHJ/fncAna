@@ -10,10 +10,16 @@ from hjperf import cTimeBand
 
 
 def main():
-    # pathlist = fnclib.getPathDepth(setting.fncAll, 1)
+    # pathlist = fnclib.getPathDepth(setting.renamePath, 1)
     # fnclib.rename(pathlist)
     #
     # return
+
+    # 比较hostname集合
+    # fnclib.compFilebyLineSet(setting.repopath, setting.packpaht)
+    # return
+
+
 
     # 时间打点初始化
     timeBand = cTimeBand()
@@ -23,11 +29,16 @@ def main():
     fncData.init(setting.initPaht)
     timeBand.addTimePoint()
 
+    #生成数据字典
+    fnclib.genFncDataDict(setting.confluencedict)
+    return
+
     # 检查id是否在字典中
     # print(fnclib.checkIDexist(fncData.temp2check))
 
     # 处理原始数据信息,获取站点host信息
     # fileList = fnclib.getPathDepth(setting.oringinDataPath, 2)
+
     fileList = fnclib.getPathDepth(setting.fncAll, 1)
     # fileListAppend = fnclib.getPathDepth(setting.appendPath)
     timeBand.addTimePoint()

@@ -1,14 +1,33 @@
 
 import os
+import setting
+import csv
 
 iobuf = ''
 iobufLen = 10000
 logpath = ''
+slash = '\\'
 
-def  wirteCSV(strInfo, path):
+rootpath = setting.rootpath
+# fucntion
+def makepath(root, sub):
+    pathSeq = (root, sub)
+    return slash.join(pathSeq)
+
+def  wirteCSV(strInfo, path, wroot = False):
+    if wroot:
+        path = makepath(rootpath, path)
     dirCC(path)
     with open(path, 'w+') as fp:
         fp.write(strInfo)
+
+def writeCsvbyList(linelist, path):
+    fp = open(path, 'w', newline='')
+    cfpw = csv.writer(fp)
+    for line in linelist:
+        cfpw.writerow(line)
+    fp.close()
+
 
 def wirteText(strInfo, path):
     dirCC(path)
