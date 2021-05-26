@@ -3,13 +3,16 @@ import CpuInfoProc
 import fnclib
 import fncData
 import hjio
-import time
 import setting
 from hjperf import cTimeBand
 
 
+import time
+import sys
 
 def main():
+    print(sys.path)
+    return
     # pathlist = fnclib.getPathDepth(setting.renamePath, 1)
     # fnclib.rename(pathlist)
     #
