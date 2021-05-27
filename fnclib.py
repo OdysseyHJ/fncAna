@@ -40,6 +40,28 @@ DIR_FREE = '@free'
 DIR_LEVLE2 = '@level2'
 
 
+class fncObj:
+
+    def __init__(self, id=0,
+                       name='None',
+                       fname='None', path='None',
+                       content='None', body='None', directory='None',
+                       hostname = 'None'):
+        self.id = id
+        self.name = name     #公式名
+        self.fname = fname   #文件名
+        self.path = path     #文件路径
+        self.content = content #全部公式文件内容
+        self.body = body  #去除公式名字的文件内容
+        self.directory = directory  #plugins/free/level2
+        self.hostname = hostname  #hostname
+        self.period = 0  #适用周期
+
+    def showInfo(self):
+        infoTmp = 'ID: {}  Name: {}  Fname: {}  Directory: {}\nPath: {}\nContent: {}\nBody: {}\n'
+        strInfo = infoTmp.format(self.id, self.name, self.fname, self.directory, self.path, self.content, self.body)
+        print(strInfo)
+
 
 # 获取目标路径下的文本路径信息
 # return [(current_path, [sub_path_list], [file_list]),(sub_path1, [sub_path_list], [file_list]), ...]
@@ -267,26 +289,7 @@ def isFncFile(filename):
 
 
 
-class fncObj:
 
-    def __init__(self, id=0,
-                       name='None',
-                       fname='None', path='None',
-                       content='None', body='None', directory='None',
-                       hostname = 'None'):
-        self.id = id
-        self.name = name     #公式名
-        self.fname = fname   #文件名
-        self.path = path     #文件路径
-        self.content = content #全部公式文件内容
-        self.body = body  #去除公式名字的文件内容
-        self.directory = directory  #plugins/free/level2
-        self.hostname = hostname  #hostname
-
-    def showInfo(self):
-        infoTmp = 'ID: {}  Name: {}  Fname: {}  Directory: {}\nPath: {}\nContent: {}\nBody: {}\n'
-        strInfo = infoTmp.format(self.id, self.name, self.fname, self.directory, self.path, self.content, self.body)
-        print(strInfo)
 
 def getFncDict(folderPath, hostname = "None"):
     fncDict = {}

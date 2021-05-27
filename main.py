@@ -5,14 +5,18 @@ import fncData
 import hjio
 import setting
 from hjperf import cTimeBand
-
+import minConvert
+import fncDataDict
+import hjqt
 
 import time
 import sys
 
 def main():
-    print(sys.path)
-    return
+
+
+    # hjqt.proc()
+    # return
     # pathlist = fnclib.getPathDepth(setting.renamePath, 1)
     # fnclib.rename(pathlist)
     #
@@ -22,8 +26,6 @@ def main():
     # fnclib.compFilebyLineSet(setting.repopath, setting.packpaht)
     # return
 
-
-
     # 时间打点初始化
     timeBand = cTimeBand()
     timeBand.addTimePoint()
@@ -31,6 +33,9 @@ def main():
     # 初始化 必要
     fncData.init(setting.initPaht)
     timeBand.addTimePoint()
+
+    fncDataDict.proc()
+    return
 
     #生成数据字典
     fnclib.genFncDataDict(setting.confluencedict)
