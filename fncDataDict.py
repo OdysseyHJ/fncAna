@@ -30,8 +30,18 @@ class CFncDataDict(QWidget):
         self.initLable()
         self.initBotton()
 
-        self.setGeometry(300, 300, 800, 600)
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addWidget(self.qbtnSearch)
+        # hbox.addWidget(cancelButton)
+        vbox = QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addLayout(hbox)
+        self.setLayout(vbox)
+
+        self.setGeometry(800, 400, 400, 800)
         self.setWindowTitle('公式字典')
+        self.setWindowIcon(QIcon('AC.jpg'))
         self.show()
 
     def initResDisplay(self):
@@ -58,6 +68,11 @@ class CFncDataDict(QWidget):
         pos = (horizonPos, vertiPos)
         self.initSection(pos, 'Name', Datatype.String)
 
+        # 公式内容匹配
+        vertiPos += secLine
+        pos = (horizonPos, vertiPos)
+        self.initSection(pos, 'Content', Datatype.String)
+
 
     def initSection(self, pos, key='default', type = Datatype.String):
         xPos = pos[0]
@@ -66,25 +81,28 @@ class CFncDataDict(QWidget):
         self.sections[key] = CSection(self)
 
         # 标题
-        self.sections[key].lblTitle.move(xPos, yPos)
+        self.sections[key].lblTitle.move(xPos, yPos+8)
         self.sections[key].lblTitle.setText(key)
         self.sections[key].lblTitle.adjustSize()
 
         # 输入框
-        self.sections[key].qleIn.move(xPos, yPos+20)
+        self.sections[key].qleIn.move(xPos+40, yPos)
         self.sections[key].qleIn.textChanged[str].connect(self.sections[key].inputChange)
         self.sections[key].type = type
 
         # 消息框
-        self.sections[key].lblMsg.move(xPos+140, yPos+20)
+        self.sections[key].lblMsg.move(xPos+150, yPos+8)
 
     def initBotton(self):
-        qbtnSearch = QPushButton('查询', self)
-        qbtnSearch.clicked.connect(self.search)
-        qbtnSearch.resize(qbtnSearch.sizeHint())
-        qbtnSearch.move(700, 50)
+        self.qbtnSearch = QPushButton('查询', self)
+        self.qbtnSearch.clicked.connect(self.search)
+        self.qbtnSearch.resize(self.qbtnSearch.sizeHint())
+        self.qbtnSearch.move(700, 50)
 
-
+        # qbtnSearch = QPushButton('查询', self)
+        # qbtnSearch.clicked.connect(self.search)
+        # qbtnSearch.resize(qbtnSearch.sizeHint())
+        # qbtnSearch.move(700, 50)
 
 
     def search(self):
@@ -103,20 +121,27 @@ class CFncDataDict(QWidget):
                 fobj.id = self.sections[key].data
             elif key == 'Name':
                 fobj.name = self.sections[key].data
+            elif key == 'Content':
+                fobj.algrithm = self.sections[key].data
 
         return fobj
 
     # @staticmethod
     def selectInDatabase(self, sfobj):
         res = []
+        # 公式id匹配
         if sfobj.id != 0:
             if sfobj.id in fncData.baseDict.keys():
                 res = fncData.baseDict[sfobj.id]
             else:
                 return res
         else:
-            for value in fncData.baseDict.values():
-                res += value
+            keylist = list(fncData.baseDict.keys())
+            keylist.sort()
+            for key in keylist:
+                res += fncData.baseDict[key]
+
+        # 公式名字匹配
         tempRes = []
         try:
             if len(sfobj.name) != 0:
@@ -125,9 +150,21 @@ class CFncDataDict(QWidget):
                         tempRes.append(fobj)
 
                 res = tempRes
-
         except:
             print('process name failed!')
+
+        # 公式内容匹配
+        tempRes = []
+        try:
+            print(type(sfobj.algrithm))
+            if len(sfobj.algrithm) != 0:
+
+                for fobj in res:
+                    if fobj.algrithm.find(sfobj.algrithm) >= 0:
+                        tempRes.append(fobj)
+                res = tempRes
+        except:
+            print('process content failed!')
 
         return res
 
@@ -200,7 +237,7 @@ class fncTable(QTableWidget):
         columnNamelist = ['公式ID', '公式名', '文件名', '安装目录', '适用周期']
         self.setHorizontalHeaderLabels(columnNamelist)
 
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.setAlternatingRowColors(True)
 
@@ -246,7 +283,7 @@ class fncInfoTable(QTableWidget):
         self.setWindowTitle("公式详细信息")
 
         # 设置大小
-        self.resize(920, 600)
+        self.resize(1200, 1000)
 
         # 设置行数列数
         rowCnt = 1
@@ -256,14 +293,15 @@ class fncInfoTable(QTableWidget):
 
         # 设置行列标题
         self.setVerticalHeaderLabels(['info'])
-        columnNamelist = ['公式ID', '公式文件内容', '公式算法']
+        columnNamelist = ['公式ID', '公式算法', '公式文件内容']
         self.setHorizontalHeaderLabels(columnNamelist)
         self.setColumnWidth(0, 100)
-        self.setColumnWidth(1, 500)
-        self.setColumnWidth(2, 200)
+        self.setColumnWidth(1, 600)
+        self.setColumnWidth(2, 500)
         self.setRowHeight(0, 500)
-
-
+        # self.setText
+        # self.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            # horizontalHeader().setCascadingSectionResizes(True)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # 设置表格数据
@@ -273,9 +311,15 @@ class fncInfoTable(QTableWidget):
 
 
     def setTable(self,fobj):
-        self.setItem(0, 0, QTableWidgetItem(str(fobj.id)))
-        self.setItem(0, 1, QTableWidgetItem(str(fobj.algrithm)))
-        self.setItem(0, 2, QTableWidgetItem(str(fobj.content)))
+        item0 = QTableWidgetItem(str(fobj.id))
+        item0.setTextAlignment(Qt.AlignTop)
+        self.setItem(0, 0, item0)
+        item1 = QTableWidgetItem(str(fobj.algrithm))
+        item1.setTextAlignment(Qt.AlignTop)
+        self.setItem(0, 1, item1)
+        item2 = QTableWidgetItem(str(fobj.content))
+        item2.setTextAlignment(Qt.AlignTop)
+        self.setItem(0, 2, item2)
 
 def proc():
     app = QApplication(sys.argv)
