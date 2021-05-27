@@ -99,7 +99,6 @@ class CFncDataDict(QWidget):
     def getSearchFobj(self):
         fobj = fncObj()
         for key in self.sections.keys():
-            # print(key)
             if key == 'ID':
                 fobj.id = self.sections[key].data
             elif key == 'Name':
@@ -110,7 +109,6 @@ class CFncDataDict(QWidget):
     # @staticmethod
     def selectInDatabase(self, sfobj):
         res = []
-        print(sfobj.id)
         if sfobj.id != 0:
             if sfobj.id in fncData.baseDict.keys():
                 res = fncData.baseDict[sfobj.id]
@@ -119,10 +117,8 @@ class CFncDataDict(QWidget):
         else:
             for value in fncData.baseDict.values():
                 res += value
-        print('res1:' + str(res))
         tempRes = []
         try:
-            print(sfobj.name)
             if len(sfobj.name) != 0:
                 for fobj in res:
                     if fobj.name.find(sfobj.name) >= 0:
@@ -136,7 +132,6 @@ class CFncDataDict(QWidget):
         return res
 
     def searchResShow(self, res):
-        print(res)
         str = 'founded!'
         # disTemp = '{}\n'
         # for fobj in res:
@@ -196,7 +191,6 @@ class fncTable(QTableWidget):
 
         # 设置行数列数
         rowCnt = len(fobjlist)
-        # print(rowCnt)
         self.setRowCount(rowCnt)
         self.setColumnCount(5)
 
@@ -208,6 +202,7 @@ class fncTable(QTableWidget):
 
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.setAlternatingRowColors(True)
 
         # 设置表格数据
         self.setTable(fobjlist)
@@ -268,6 +263,7 @@ class fncInfoTable(QTableWidget):
         self.setColumnWidth(2, 200)
         self.setRowHeight(0, 500)
 
+
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # 设置表格数据
@@ -278,7 +274,7 @@ class fncInfoTable(QTableWidget):
 
     def setTable(self,fobj):
         self.setItem(0, 0, QTableWidgetItem(str(fobj.id)))
-        self.setItem(0, 1, QTableWidgetItem(str(fnclib.fncDecode(fobj.body))))
+        self.setItem(0, 1, QTableWidgetItem(str(fobj.algrithm)))
         self.setItem(0, 2, QTableWidgetItem(str(fobj.content)))
 
 def proc():

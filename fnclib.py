@@ -56,6 +56,7 @@ class fncObj:
         self.directory = directory  #plugins/free/level2
         self.hostname = hostname  #hostname
         self.period = 0  #适用周期
+        self.algrithm = ''  #算法
 
     def showInfo(self):
         infoTmp = 'ID: {}  Name: {}  Fname: {}  Directory: {}\nPath: {}\nContent: {}\nBody: {}\n'
@@ -305,7 +306,8 @@ def getFncDict(folderPath, hostname = "None"):
                 tmpfncObj = fncObj()
                 fnc = fncFile.read()
 
-                fncsplit = fnc.split(',')
+                # 去掉末尾换行、分号,按逗号分隔
+                fncsplit = fnc.split('\n')[0].split(';')[0].split(',')
                 if len(fncsplit) < 2:
                     print('getFncDict: error file, name=' + filePath)
                     continue
@@ -317,6 +319,13 @@ def getFncDict(folderPath, hostname = "None"):
                 tmpfncObj.name = fncsplit[0]
                 tmpfncObj.body = fnc.split(',', 1)[1]
                 tmpfncObj.hostname = hostname
+
+                if len(fncsplit[3]) > 0:
+                    tmpfncObj.algrithm = fncDecode(fncsplit[3])
+
+                if len(fncsplit) == 5:
+                    tmpfncObj.period = fncsplit[4]
+
                 # print("hello " + hostname)
 
                 pathSplit = filePath.split('\\')
