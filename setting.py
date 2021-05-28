@@ -11,10 +11,10 @@ slash = '\\'
 
 
 # home path
-rootpath = r'H:\HJ_Docs\公式统计'
+# rootpath = r'H:\HJ_Docs\公式统计'
 
 # ths path
-# rootpath = r'D:\HJ_EX_Docs\公式原始数据'
+rootpath = r'D:\HJ_EX_Docs\公式原始数据'
 # rootpath = r'D:\HJ_EX_Docs\公式原始数据\新版本统计信息'
 
 

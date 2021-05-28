@@ -14,6 +14,11 @@ class Datatype(Enum):
     String = 2
     float = 3
 
+# dir bit map
+DIR_BIT_PLUGINS = 1
+DIR_BIT_FREE = 2
+DIR_BIT_LEVEL2 = 4
+
 class CFncDataDict(QWidget):
     def __init__(self):
         super().__init__()
@@ -39,14 +44,14 @@ class CFncDataDict(QWidget):
         vbox.addLayout(hbox)
         self.setLayout(vbox)
 
-        self.setGeometry(800, 400, 400, 800)
+        self.setGeometry(300, 300, 400, 600)
         self.setWindowTitle('公式字典')
         self.setWindowIcon(QIcon('AC.jpg'))
         self.show()
 
     def initResDisplay(self):
-        xPos = 500
-        yPos = 100
+        xPos = 30
+        yPos = 30
         self.DispInfo = QLabel(self)
         self.DispInfo.move(xPos, yPos)
         self.DispInfo.setText('')
@@ -54,7 +59,7 @@ class CFncDataDict(QWidget):
 
     def initLable(self):
 
-        horizonPos = 60
+        horizonPos = 30
         horizonPosOff = 140
         vertiPos = 80
         secLine = 40
@@ -73,6 +78,12 @@ class CFncDataDict(QWidget):
         pos = (horizonPos, vertiPos)
         self.initSection(pos, 'Content', Datatype.String)
 
+        # 安装目录
+        vertiPos += secLine
+        pos = (horizonPos, vertiPos)
+        self.checkbox(pos, 'directory', Datatype.String)
+
+
 
     def initSection(self, pos, key='default', type = Datatype.String):
         xPos = pos[0]
@@ -86,12 +97,12 @@ class CFncDataDict(QWidget):
         self.sections[key].lblTitle.adjustSize()
 
         # 输入框
-        self.sections[key].qleIn.move(xPos+40, yPos)
+        self.sections[key].qleIn.move(xPos+60, yPos)
         self.sections[key].qleIn.textChanged[str].connect(self.sections[key].inputChange)
         self.sections[key].type = type
 
         # 消息框
-        self.sections[key].lblMsg.move(xPos+150, yPos+8)
+        self.sections[key].lblMsg.move(xPos+180, yPos+8)
 
     def initBotton(self):
         self.qbtnSearch = QPushButton('查询', self)
@@ -104,6 +115,29 @@ class CFncDataDict(QWidget):
         # qbtnSearch.resize(qbtnSearch.sizeHint())
         # qbtnSearch.move(700, 50)
 
+    def checkbox(self, pos, key='default', type = Datatype.String):
+        xPos = pos[0]
+        yPos = pos[1]
+
+        lblTitle = QLabel(self)
+        lblTitle.setText(key)
+        lblTitle.adjustSize()
+        lblTitle.move(xPos, yPos + 8)
+
+        cb = QCheckBox('plugins', self)
+        cb.move(xPos+60, yPos+5)
+        cb.toggle()
+        cb.stateChanged.connect(self.changeTitle)
+
+        self.setGeometry(300, 300, 250, 150)
+        self.setWindowTitle('QCheckBox')
+        self.show()
+
+    def changeTitle(self, state):
+        if state == Qt.Checked:
+            self.fobjIn.directory |= DIR_BIT_PLUGINS
+        else:
+            self.fobjIn.directory &= ~DIR_BIT_PLUGINS
 
     def search(self):
         fobj = self.getSearchFobj()
@@ -165,6 +199,17 @@ class CFncDataDict(QWidget):
                 res = tempRes
         except:
             print('process content failed!')
+
+        # 公式目录匹配
+        tempRes = []
+        if sfobj.directory != 0:
+            print(sfobj.directory)
+            for fobj in res:
+                if fobj.getDirBit() & sfobj.directory:
+                    # print(fobj.getDirBit())
+                    tempRes.append(fobj)
+
+            res = tempRes
 
         return res
 
@@ -280,10 +325,10 @@ class fncInfoTable(QTableWidget):
     def __init__(self, fobj):
         super().__init__()
 
-        self.setWindowTitle("公式详细信息")
+        self.setWindowTitle("公式" + str(fobj.id))
 
         # 设置大小
-        self.resize(1200, 1000)
+        self.resize(800, 600)
 
         # 设置行数列数
         rowCnt = 1
