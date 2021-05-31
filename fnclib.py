@@ -379,6 +379,9 @@ def getFncDict(folderPath, hostname = "None"):
                     tmpfncObj.directory = DIR_FREE
                 elif DIR_LEVEL2 in pathSplit:
                     tmpfncObj.directory = DIR_LEVEL2
+                elif filePath.find('@'):
+                    hjio.writelog("directory is filtered:{}".format(filePath))
+                    continue
                 else:
                     tmpfncObj.directory = DIR_PLUGINS
 

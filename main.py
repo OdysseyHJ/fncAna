@@ -8,13 +8,24 @@ from hjperf import cTimeBand
 import minConvert
 import fncDataDict
 import hjqt
+import temp
 
 import time
 import sys
 
 def main():
+    # fileList = fnclib.getPathDepth(r'D:\HJ_EX_Docs\公式原始数据\运维打包20210528\xpack_1167_forstats\xpack', 1, False)
+    # print(fileList)
+    # return
+    # res = []
+    for host in temp.fncyws1089:
+        if host not in temp.hostall1638:
+            print(host)
+    # res = '\n'.join(set(temp.csywstest31 + temp.fncywstest22))
+    # print(res)
+    return
 
-
+    # print(fileList)
     # hjqt.proc()
     # return
     # pathlist = fnclib.getPathDepth(setting.renamePath, 1)

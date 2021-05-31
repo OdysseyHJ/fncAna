@@ -11,9 +11,9 @@ slash = '\\'
 
 
 # home path
-rootpath = r'H:\HJ_Docs\公式统计'
+# rootpath = r'H:\HJ_Docs\公式统计'
 # ths path
-# rootpath = r'D:\HJ_EX_Docs\公式原始数据'
+rootpath = r'D:\HJ_EX_Docs\公式原始数据'
 # rootpath = r'D:\HJ_EX_Docs\公式原始数据\新版本统计信息'
 
 
@@ -26,7 +26,8 @@ oringinDataPath = makepath(rootpath, r'true_online_plugins\true_online_plugins')
 
 appendPath = makepath(rootpath, r'HJNBxxx')
 
-fncAll = makepath(rootpath, r'fncAll20210529')
+# fncAll = makepath(rootpath, r'fncAll20210529')
+fncAll = makepath(rootpath, r'fncAll20210531')
 renamePath = makepath(rootpath, r'renameFolder')
 
 # output
