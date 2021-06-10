@@ -14,24 +14,11 @@ import time
 import sys
 
 def main():
-    # fileList = fnclib.getPathDepth(r'D:\HJ_EX_Docs\公式原始数据\运维打包20210528\xpack_1167_forstats\xpack', 1, False)
-    # print(fileList)
-    # return
-    # res = []
-    for host in temp.fncyws1089:
-        if host not in temp.hostall1638:
-            print(host)
-    # res = '\n'.join(set(temp.csywstest31 + temp.fncywstest22))
-    # print(res)
-    return
 
-    # print(fileList)
-    # hjqt.proc()
+    # cs_fnc = set(temp.csywslist + temp.csywstest31 + temp.fncyws1089 + temp.fncywstest22)
+    # print(cs_fnc - set(temp.hqall1667))
     # return
-    # pathlist = fnclib.getPathDepth(setting.renamePath, 1)
-    # fnclib.rename(pathlist)
-    #
-    # return
+
 
     # 比较hostname集合
     # fnclib.compFilebyLineSet(setting.repopath, setting.packpaht)
@@ -49,9 +36,20 @@ def main():
     fncData.init(setting.initPaht)
     timeBand.addTimePoint()
 
-    # 数据字典exe
-    # fncDataDict.proc()
+    # 生成数据字典表格源数据
+    # fncData.dataDictTableProc(setting.excelDict)
     # return
+
+    # 数据字段查找
+    # tar2find = temp.tar2find
+    # fnclib.findContent(tar2find)
+    # return
+
+    # 数据字典exe
+    fncDataDict.proc()
+    # while True:
+    #     pass
+    return
 
     #生成数据字典
     # fnclib.genFncDataDict(setting.confluencedict)

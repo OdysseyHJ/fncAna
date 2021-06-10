@@ -43,7 +43,8 @@ packpaht = makepath(rootpath, r'host信息\packres.txt')
 
 # 数据字典
 confluencedict = makepath(rootpath, r'数据字典\dict1.csv')
+excelDict = makepath(rootpath, r'数据字典\excelDict.csv')
 
 
 # 日志路径
-logpath = makepath(rootpath, r'fnc-process.log')
+logpath = makepath(rootpath, r'\log\fnc-process.log')

@@ -63,6 +63,7 @@ class fncObj:
         self.body = ''  #去除公式名字的文件内容
         self.directory = 0  #plugins/free/level2
         self.hostname = ''  #hostname
+        self.csinstance = '' #host_rundir
         self.period = 0  #适用周期
         self.algrithm = ''  #算法
 
@@ -278,7 +279,7 @@ def genFncStatistciInfo(fileList, outputPath):
         g_hexinIniDict[csinstance] = hxobj
         hxidAllAddDict(hxobj)
 
-        fncdict = getFncDict(path, hostname)
+        fncdict = getFncDict(path, csinstance)
         errorStat = getErrorStat(fncdict)
         conflictStat = getConflictStat(fncdict)
 
@@ -329,7 +330,7 @@ def isFncFile(filename):
 
 
 
-def getFncDict(folderPath, hostname = "None"):
+def getFncDict(folderPath, csinstance = "None"):
     fncDict = {}
     filelib = getFileLib(folderPath)
     for root, dirs, files in filelib:
@@ -364,7 +365,11 @@ def getFncDict(folderPath, hostname = "None"):
                 tmpfncObj.content = fnc
                 tmpfncObj.name = fncsplit[0]
                 tmpfncObj.body = fnc.split(',', 1)[1]
+                tmpfncObj.csinstance = csinstance
+
+                hostname = csinstance.split('_hqserver')[0]
                 tmpfncObj.hostname = hostname
+
 
                 if len(fncsplit[3]) > 0:
                     tmpfncObj.algrithm = fncDecode(fncsplit[3])
@@ -379,7 +384,7 @@ def getFncDict(folderPath, hostname = "None"):
                     tmpfncObj.directory = DIR_FREE
                 elif DIR_LEVEL2 in pathSplit:
                     tmpfncObj.directory = DIR_LEVEL2
-                elif filePath.find('@'):
+                elif filePath.find('@') >= 0:
                     hjio.writelog("directory is filtered:{}".format(filePath))
                     continue
                 else:
@@ -526,7 +531,7 @@ def addFncObj(fncobj):
     fid = fncobj.id
     fdir = fncobj.directory
     fbody = fncobj.body
-    fhost = fncobj.hostname
+    fhost = fncobj.csinstance
     fpath = fncobj.path
 
     if fdir not in g_fncAllmap.keys():
@@ -766,6 +771,40 @@ def hexiniContentProc(content, baseDict = {}):
     return baseDict
 
 
+class HexinIniUnit:
+    def __init__(self):
+        self.id = 0
+        self.name = ''
+        self.description = ''
+
+    def dispInfo(self):
+        print(self.id, self.name, self.description)
+        return
+
+def getHxiniDatadict(filepath):
+    filecontent = hjio.readFile(filepath)
+    linelist = filecontent.split('\n')
+
+    hxID2obj = {}
+    hxName2obj = {}
+
+    for line in linelist:
+        unitlist = line.split(',')
+        hexinObj = HexinIniUnit()
+        if len(unitlist) < 3:
+            hjio.writelog('hexin.ini error line:{}'.format(line))
+            continue
+        hexinObj.id = int(unitlist[0].split('=')[0])
+        if hexinObj.id == 344149:
+            continue
+        hexinObj.name = unitlist[1].upper()
+        hexinObj.description = unitlist[2]
+        hxID2obj[hexinObj.id] = hexinObj
+        hxName2obj[hexinObj.name] = hexinObj
+
+    return (hxID2obj, hxName2obj)
+
+
 def hexinInfoOutput(filepath):
     pass
 
@@ -819,3 +858,32 @@ def genHexinInfo(path):
     filename = "{}\{}".format(path, 'hexin字段统计.csv')
     hjio.wirteCSV(csvinfo, filename)
     return True
+
+def findContent(tar2find):
+    if type(tar2find) == type('str'):
+        tar2find = [tar2find]
+
+    if type(tar2find) != type([]):
+        hjio.writelog('error input type:{}'.format(type(tar2find)))
+
+    fobjlist = []
+    keylist = list(fncData.baseDict.keys())
+    keylist.sort()
+    for key in keylist:
+        fobjlist += fncData.baseDict[key]
+
+
+    for eachTar in tar2find:
+        usedTag = False
+        for fobj in fobjlist:
+            if fobj.algrithm.find(eachTar) >= 0:
+                usedTag = True
+                break
+        if usedTag:
+            hjio.writelog("data {} is used".format(eachTar))
+        else:
+            hjio.writelog("data {} not used".format(eachTar))
+
+    hjio.clearbuf()
+    return
+

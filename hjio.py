@@ -51,6 +51,8 @@ def dirCC(path):
 def init(filepath):
     global logpath
     logpath = filepath
+    print('logpath')
+    print(logpath)
 
 
 def writelog(strLoginfo):
@@ -61,6 +63,7 @@ def writelog(strLoginfo):
     return
 
 def clearbuf(strTail=''):
+
     global iobuf
     iobuf += strTail
     with open(logpath, 'a') as fp:
