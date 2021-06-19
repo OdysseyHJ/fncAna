@@ -185,7 +185,7 @@ def hexinSmName2Table(smName):
     elif smName == SM_FD_NAME:
         return '财务数据'
     else:
-        return '指标'
+        return '计算指标'
 
 def dataDictTableProc(path):
     # tableHead = ['']
@@ -204,6 +204,9 @@ def dataDictTableProc(path):
     for key in keylist:
         for fobj in baseDict[key]:
             refAnaRes = fnchexinUnitRefAna(fobj)
+            periodRange = 0
+            defaultPeriod = 0
+            periodItem = 0
             line = [fobj.id,
                     fobj.name,
                     '', #含义

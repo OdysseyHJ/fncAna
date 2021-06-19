@@ -51,6 +51,29 @@ DIR_BIT_FREE = 2
 DIR_BIT_LEVEL2 = 4
 
 
+#fnc period
+FNC_PERIOD_REALTIME     = 0x0000
+FNC_PERIOD_TRACE        = 0x1000
+FNC_PERIOD_MINTIME      = 0x2000
+FNC_PERIOD_MINUTE       = 0x3000
+FNC_PERIOD_DAY          = 0x4000
+FNC_PERIOD_WEEK         = 0x5000
+FNC_PERIOD_MONTH        = 0x6000
+FNC_PERIOD_SEASON       = 0x6003
+FNC_PERIOD_YEAR         = 0x7000
+
+periodDic = {
+    FNC_PERIOD_REALTIME     : 'now',
+    FNC_PERIOD_TRACE        : 'stream',
+    FNC_PERIOD_MINTIME      : 'stream',
+    FNC_PERIOD_MINUTE       : 'minN',
+    FNC_PERIOD_DAY          : 'dayN',
+    FNC_PERIOD_WEEK         : 'weekN',
+    FNC_PERIOD_MONTH        : 'quarterN',
+    FNC_PERIOD_SEASON       : 'quarterN',
+    FNC_PERIOD_YEAR         : 'yearN',
+}
+
 
 class fncObj:
 
@@ -82,7 +105,16 @@ class fncObj:
         else:
             return 0
 
+    def getDefaultPeriod(self):
+        pass
 
+    def getPeriodRange(self):
+        periodStart = self.period & 0x0000ffff
+        periodEnd = (self.period >> 4) & 0x0000ffff
+        return (periodStart, periodEnd)
+
+    def getPeriodItem(self):
+        pass
 
 # 获取目标路径下的文本路径信息
 # return [(current_path, [sub_path_list], [file_list]),(sub_path1, [sub_path_list], [file_list]), ...]
