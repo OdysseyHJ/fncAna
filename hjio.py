@@ -4,8 +4,13 @@ import setting
 import csv
 
 iobuf = ''
-iobufLen = 10000
+iobufLen = 10
 logpath = ''
+logcount = 0
+logname = 'fnc_process_{}.log'
+logSizeDefault = 1024 * 1024 * 5   #bytes
+
+
 slash = '\\'
 
 rootpath = setting.rootpath
@@ -65,7 +70,20 @@ def writelog(strLoginfo):
 def clearbuf(strTail=''):
 
     global iobuf
+    global logcount
     iobuf += strTail
-    with open(logpath, 'a') as fp:
+    logfile = logpath + logname.format(logcount)
+
+    try:
+        filesize = os.path.getsize(logfile)
+        if filesize > logSizeDefault:
+            logcount += 1
+            logfile = logpath + logname.format(logcount)
+    except:
+        pass
+
+    with open(logfile, 'a') as fp:
         fp.write(iobuf)
     iobuf = ''
+
+

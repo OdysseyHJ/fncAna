@@ -52,6 +52,7 @@ DIR_BIT_LEVEL2 = 4
 
 
 #fnc period
+FNC_PERIOD_MASK         = 0xF000
 FNC_PERIOD_REALTIME     = 0x0000
 FNC_PERIOD_TRACE        = 0x1000
 FNC_PERIOD_MINTIME      = 0x2000
@@ -61,8 +62,9 @@ FNC_PERIOD_WEEK         = 0x5000
 FNC_PERIOD_MONTH        = 0x6000
 FNC_PERIOD_SEASON       = 0x6003
 FNC_PERIOD_YEAR         = 0x7000
+FNC_PERIOD_KLEND         = 0X7FFF
 
-periodDic = {
+periodDict = {
     FNC_PERIOD_REALTIME     : 'now',
     FNC_PERIOD_TRACE        : 'stream',
     FNC_PERIOD_MINTIME      : 'stream',
@@ -106,15 +108,61 @@ class fncObj:
             return 0
 
     def getDefaultPeriod(self):
-        pass
+        (periodStart, periodEnd) = self.getPeriodRange()
+        defaultPeriod = (periodStart & FNC_PERIOD_MASK)
+        if defaultPeriod == FNC_PERIOD_MINUTE and periodEnd == FNC_PERIOD_KLEND:
+            defaultPeriod = FNC_PERIOD_DAY
+        return defaultPeriod
+
+    def getDefaultPeriodItem(self):
+        period = self.getDefaultPeriod()
+        if period in periodDict.keys():
+            return periodDict[period]
+        else:
+            hjio.writelog('wrong period:{}'.format(period))
+            return None
 
     def getPeriodRange(self):
         periodStart = self.period & 0x0000ffff
-        periodEnd = (self.period >> 4) & 0x0000ffff
+        periodEnd = (self.period >> 16) & 0x0000ffff
         return (periodStart, periodEnd)
 
+    def getStrPeriodRange(self):
+        (periodStart, periodEnd) = self.getPeriodRange()
+        return "{}-{}".format(hex(periodStart), hex(periodEnd))
+
     def getPeriodItem(self):
-        pass
+        periodList = []
+        (periodStart, periodEnd) = self.getPeriodRange()
+        if periodStart == FNC_PERIOD_REALTIME:
+            periodList.append(periodDict[FNC_PERIOD_REALTIME])
+        if periodStart <= FNC_PERIOD_TRACE and FNC_PERIOD_TRACE <= periodEnd:
+            periodList.append(periodDict[FNC_PERIOD_TRACE])
+        if periodStart <= FNC_PERIOD_MINTIME and FNC_PERIOD_MINTIME <= periodEnd:
+            periodList.append(periodDict[FNC_PERIOD_MINTIME])
+        if periodStart <= FNC_PERIOD_MINUTE and FNC_PERIOD_MINUTE <= periodEnd:
+            periodList.append(periodDict[FNC_PERIOD_MINUTE])
+        if periodStart <= FNC_PERIOD_DAY and FNC_PERIOD_DAY <= periodEnd:
+            periodList.append(periodDict[FNC_PERIOD_DAY])
+        if periodStart <= FNC_PERIOD_WEEK and FNC_PERIOD_WEEK <= periodEnd:
+            periodList.append(periodDict[FNC_PERIOD_WEEK])
+        if periodStart <= FNC_PERIOD_MONTH and FNC_PERIOD_MONTH <= periodEnd:
+            periodList.append(periodDict[FNC_PERIOD_MONTH])
+        if periodStart <= FNC_PERIOD_YEAR and FNC_PERIOD_YEAR <= periodEnd:
+            periodList.append(periodDict[FNC_PERIOD_YEAR])
+
+        return periodList
+
+    def getStrPeriodItem(self):
+        periodList = self.getPeriodItem()
+        return ','.join(periodList)
+
+    def getFilenamePrefix(self):
+        reslist = self.fname.split('.')
+        prefix = ''
+        if len(reslist) == 2 and reslist[1] == 'fnc':
+            prefix = str(reslist[0])
+        return prefix.upper()
 
 # 获取目标路径下的文本路径信息
 # return [(current_path, [sub_path_list], [file_list]),(sub_path1, [sub_path_list], [file_list]), ...]
@@ -153,7 +201,7 @@ def getPathDepth(folderPath, depth = 1, fullPath = True):
 
 
 # 获取路径下指定深度的目录路径
-def getFileDepth(folderPath, depth, fullPath = True):
+def getFileDepth(folderPath, depth = 1, fullPath = True):
     rootDepth = len(folderPath.split(os.path.sep))
     fileList = []
     endFlag = False
@@ -407,7 +455,7 @@ def getFncDict(folderPath, csinstance = "None"):
                     tmpfncObj.algrithm = fncDecode(fncsplit[3])
 
                 if len(fncsplit) == 5:
-                    tmpfncObj.period = fncsplit[4]
+                    tmpfncObj.period = int(fncsplit[4])
 
                 # print("hello " + hostname)
 
@@ -827,7 +875,7 @@ def getHxiniDatadict(filepath):
             hjio.writelog('hexin.ini error line:{}'.format(line))
             continue
         hexinObj.id = int(unitlist[0].split('=')[0])
-        if hexinObj.id == 344149:
+        if hexinObj.id == 3443149:
             continue
         hexinObj.name = unitlist[1].upper()
         hexinObj.description = unitlist[2]

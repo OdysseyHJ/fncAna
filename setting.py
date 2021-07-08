@@ -21,7 +21,8 @@ def makepath(root, sub):
     pathSeq = (root, sub)
     return slash.join(pathSeq)
 
-initPaht = makepath(rootpath, r'最新公式包\plugins_add')
+# initPaht = makepath(rootpath, r'最新公式包\plugins_add')
+initPaht = r'.\plugins'
 oringinDataPath = makepath(rootpath, r'true_online_plugins\true_online_plugins')
 
 appendPath = makepath(rootpath, r'HJNBxxx')
@@ -47,4 +48,12 @@ excelDict = makepath(rootpath, r'数据字典\excelDict.csv')
 
 
 # 日志路径
-logpath = makepath(rootpath, r'\log\fnc-process.log')
+# logpath = makepath(rootpath, r'\log\\')
+logpath = r'.\log\\'
+
+# 用户录包
+userReqPath = makepath(rootpath, r'用户请求录包')
+idRefAna = makepath(rootpath, r'UserReqAna.txt')
+idCountPath = makepath(rootpath, r'reqIDcount.csv')
+
+

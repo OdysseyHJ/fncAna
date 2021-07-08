@@ -5,6 +5,7 @@ import re
 from commonDef import HexinIni
 import fnclib
 import hjio
+import temp
 
 
 
@@ -200,13 +201,36 @@ def dataDictTableProc(path):
     keylist = list(baseDict.keys())
     keylist.sort()
 
-    linelist = []
+    tablehead = [  "id",
+                    "名称",
+                    "含义",
+                    "类型（基础行情/财务/指标）",
+                    "市场+权限（范围：上海/level-1、深圳/level-2等）",
+                    "证券类型（指数、股票、基金、债券、期货、期权、权证）",
+                    "交易分类（取值范围：盘前、盘中、盘后）",
+                    "数据分类（范围：快照、分时、k线、明细、逐笔成交、逐笔委托）",
+                    "时间周期（minN、dayN、weekN、yearN、stream、now）",
+                    "指标默认计算分类和周期",
+                    "周期区间",
+                    "周期值",
+                    "说明",
+                    "公式文件",
+                    "公式目录",
+                    "公式内容",
+                    "更新时间",
+                    "引用数据项（基础数据）",
+                    "引用数据项（财务数据）",
+                    "引用数据项（其他数据）",
+                    "引用系统函数",]
+    linelist = [tablehead]
     for key in keylist:
         for fobj in baseDict[key]:
+            if isHighFreqID(fobj.id) == False:
+                continue
             refAnaRes = fnchexinUnitRefAna(fobj)
-            periodRange = 0
-            defaultPeriod = 0
-            periodItem = 0
+            periodRange = fobj.getStrPeriodRange()
+            defaultPeriod = fobj.getDefaultPeriodItem()
+            periodItem = fobj.getStrPeriodItem()
             line = [fobj.id,
                     fobj.name,
                     '', #含义
@@ -215,7 +239,9 @@ def dataDictTableProc(path):
                     '', #证券类型
                     '', #交易分类
                     '', #数据分类
-                    fobj.period,
+                    periodItem,
+                    defaultPeriod,
+                    periodRange,
                     fobj.period,
                     '', #说明
                     fobj.fname,
@@ -224,9 +250,22 @@ def dataDictTableProc(path):
                     '2021-6-6',
                     ]
             line += refAnaRes
-        linelist.append(line)
+            linelist.append(line)
     hjio.writeCsvbyList(linelist, path)
     return
+
+def isHighFreqID(id):
+    # print(len(temp.highFreqID))
+    if id in temp.highFreqID:
+        return True
+    return False
+
+
+
+
+
+
+
 
 # 待校验
 temp2check = (3142,3119,3120

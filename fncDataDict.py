@@ -7,7 +7,7 @@ from enum import Enum
 import fncData
 from fnclib import fncObj
 import fnclib
-
+import hjio
 
 class Datatype(Enum):
     Int = 1
@@ -124,23 +124,23 @@ class CFncDataDict(QWidget):
         lblTitle.adjustSize()
         lblTitle.move(xPos, yPos + 8)
 
-        cbPlug = QCheckBox('plugins', self)
-        cbPlug.move(xPos+60, yPos+5)
+        self.cbPlug = QCheckBox('plugins', self)
+        self.cbPlug.move(xPos+60, yPos+5)
         # toggle 默认勾选
         # cb.toggle()
-        cbPlug.stateChanged.connect(self.changePlug)
+        self.cbPlug.stateChanged.connect(self.changePlug)
 
-        cbFree= QCheckBox('free', self)
-        cbFree.move(xPos+160, yPos+5)
+        self.cbFree= QCheckBox('free', self)
+        self.cbFree.move(xPos+160, yPos+5)
         # toggle 默认勾选
         # cb.toggle()
-        cbFree.stateChanged.connect(self.changeFree)
+        self.cbFree.stateChanged.connect(self.changeFree)
 
-        cbLevel2= QCheckBox('level2', self)
-        cbLevel2.move(xPos+260, yPos+5)
+        self.cbLevel2= QCheckBox('level2', self)
+        self.cbLevel2.move(xPos+260, yPos+5)
         # toggle 默认勾选
         # cb.toggle()
-        cbLevel2.stateChanged.connect(self.changeLevel2)
+        self.cbLevel2.stateChanged.connect(self.changeLevel2)
 
     def changePlug(self, state):
         if state == Qt.Checked:
@@ -199,35 +199,36 @@ class CFncDataDict(QWidget):
         # 公式名字匹配
         tempRes = []
         try:
-            if len(sfobj.name) != 0:
-                for fobj in res:
-                    if fobj.name.find(sfobj.name) >= 0:
-                        tempRes.append(fobj)
+            if type(sfobj.name) == type("str"):
+                if len(sfobj.name) != 0:
+                    for fobj in res:
+                        if fobj.name.find(sfobj.name) >= 0:
+                            tempRes.append(fobj)
 
-                res = tempRes
+                    res = tempRes
         except:
-            print('process name failed!')
+            hjio.writelog('process name failed!')
 
         # 公式内容匹配
         tempRes = []
         try:
-            print(type(sfobj.algrithm))
-            if len(sfobj.algrithm) != 0:
+            # print(type(sfobj.algrithm))
+            if type(sfobj.name) == type("str"):
+                if len(sfobj.algrithm) != 0:
 
-                for fobj in res:
-                    if fobj.algrithm.find(sfobj.algrithm) >= 0:
-                        tempRes.append(fobj)
-                res = tempRes
+                    for fobj in res:
+                        if fobj.algrithm.find(sfobj.algrithm) >= 0:
+                            tempRes.append(fobj)
+                    res = tempRes
         except:
-            print('process content failed!')
+            hjio.writelog('process content failed!')
 
         # 公式目录匹配
         tempRes = []
-        print(sfobj.directory)
+        # print(sfobj.directory)
         if sfobj.directory != 0:
 
             for fobj in res:
-                print(fobj.getDirBit())
                 if fobj.getDirBit() & sfobj.directory:
 
                     tempRes.append(fobj)
@@ -310,6 +311,7 @@ class fncTable(QTableWidget):
         self.setAlternatingRowColors(True)
 
         # 设置表格数据
+        self.btnlist = []
         self.setTable(fobjlist)
         # self.resizeRowsToContents()
         # self.resizeColumnsToContents()
@@ -321,17 +323,19 @@ class fncTable(QTableWidget):
 
     def setTable(self, fobjlist):
         for ii in range(len(fobjlist)):
-            btn = FidButton(fobjlist[ii])
-            btn.setDown(True)
+            self.btnlist.append(FidButton(fobjlist[ii]))
+            self.btnlist[ii].setDown(True)
             # 修改按钮大小
-            btn.setStyleSheet("QPushButton{margin:3px};")
-            btn.clicked.connect(btn.showInfo)
+            self.btnlist[ii].setStyleSheet("QPushButton{margin:3px};")
+            self.btnlist[ii].clicked.connect(self.btnlist[ii].showInfo)
+
             # 将按钮添加到单元格
-            self.setCellWidget(ii, 0, btn)
+            self.setCellWidget(ii, 0, self.btnlist[ii])
             self.setItem(ii, 1, QTableWidgetItem(str(fobjlist[ii].name)))
             self.setItem(ii, 2, QTableWidgetItem(str(fobjlist[ii].fname)))
             self.setItem(ii, 3, QTableWidgetItem(str(fobjlist[ii].directory)))
             self.setItem(ii, 4, QTableWidgetItem(str(fobjlist[ii].period)))
+
 
 
 
