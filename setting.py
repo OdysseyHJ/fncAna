@@ -22,7 +22,7 @@ def makepath(root, sub):
     return slash.join(pathSeq)
 
 # initPaht = makepath(rootpath, r'最新公式包\plugins_add')
-initPaht = r'.\plugins'
+initPath = r'.\plugins'
 oringinDataPath = makepath(rootpath, r'true_online_plugins\true_online_plugins')
 
 appendPath = makepath(rootpath, r'HJNBxxx')

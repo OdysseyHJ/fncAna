@@ -8,6 +8,7 @@ import fncData
 from fnclib import fncObj
 import fnclib
 import hjio
+from hjperf import cTimeBand
 
 class Datatype(Enum):
     Int = 1
@@ -213,7 +214,7 @@ class CFncDataDict(QWidget):
         tempRes = []
         try:
             # print(type(sfobj.algrithm))
-            if type(sfobj.name) == type("str"):
+            if type(sfobj.algrithm) == type("str"):
                 if len(sfobj.algrithm) != 0:
 
                     for fobj in res:
@@ -355,47 +356,86 @@ class fncInfoTable(QTableWidget):
         self.setWindowTitle("公式" + str(fobj.id))
 
         # 设置大小
-        self.resize(800, 600)
+        self.resize(1000, 800)
 
         # 设置行数列数
-        rowCnt = 1
-        columCnt = 3
+        rowCnt = 10
+        columCnt = 1
         self.setRowCount(rowCnt)
         self.setColumnCount(columCnt)
 
+        # table row index
+        self.rowIndex = -1
+
         # 设置行列标题
-        self.setVerticalHeaderLabels(['info'])
-        columnNamelist = ['公式ID', '公式算法', '公式文件内容']
+        rawNamelist = ['公式ID',
+                       '公式算法',
+                       '周期区间',
+                       '适用周期',
+                       '缺省周期',
+                       '引用基础数据项',
+                       '引用财务数据项',
+                       '引用其他数据项',
+                       '引用系统函数',
+                       '公式文件内容',]
+
+        self.setVerticalHeaderLabels(rawNamelist)
+        # self.setRowHeight(1,500)
+        columnNamelist = ['内容']
         self.setHorizontalHeaderLabels(columnNamelist)
-        self.setColumnWidth(0, 100)
-        self.setColumnWidth(1, 600)
-        self.setColumnWidth(2, 500)
-        self.setRowHeight(0, 500)
+        # self.setColumnWidth(0, 780)
+
         # self.setText
-        # self.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
-            # horizontalHeader().setCascadingSectionResizes(True)
-        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.verticalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # self.horizontalHeader().setCascadingSectionResizes(True)
+
+        # 设置表格是否可编辑
+        # self.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # 设置表格数据
         self.setTable(fobj)
-
         self.show()
 
+    def enrollRowIndex(self):
+        self.rowIndex += 1
+        return self.rowIndex
 
     def setTable(self,fobj):
-        item0 = QTableWidgetItem(str(fobj.id))
-        item0.setTextAlignment(Qt.AlignTop)
-        self.setItem(0, 0, item0)
-        item1 = QTableWidgetItem(str(fobj.algrithm))
-        item1.setTextAlignment(Qt.AlignTop)
-        self.setItem(0, 1, item1)
-        item2 = QTableWidgetItem(str(fobj.content))
-        item2.setTextAlignment(Qt.AlignTop)
-        self.setItem(0, 2, item2)
+        self.setTableRowItem(str(fobj.id))
+        self.setTableRowItem(str(fobj.algrithm))
+        self.setTableRowItem(fobj.getStrPeriodRange())
+        self.setTableRowItem(fobj.getStrPeriodItem())
+        self.setTableRowItem(fobj.getDefaultPeriodItem())
+
+        refAnaRes = fncData.fnchexinUnitRefAna(fobj)
+        self.setTableRowItem(refAnaRes[0])
+        self.setTableRowItem(refAnaRes[1])
+        self.setTableRowItem(refAnaRes[2])
+        self.setTableRowItem(refAnaRes[3])
+
+        self.setTableRowItem(str(fobj.content))
+
+
+
+    def setTableRowItem(self, strInfo):
+        item = QTableWidgetItem(strInfo)
+        item.setTextAlignment(Qt.AlignVCenter)
+        self.setItem(self.enrollRowIndex(), 0, item)
+        # self.resizeRowsToContents()
+
+        return True
+
+
 
 def proc():
+    timeBand = cTimeBand()
+    timeBand.addTimePoint()
     app = QApplication(sys.argv)
     ex = CFncDataDict()
     # ex2 = fncTable([1,2,3])
     # ex2.show()
+    timeBand.addTimePoint()
+    hjio.writelog("GUI init complete! timeband:{}".format(str(timeBand.getTimeBand())))
     sys.exit(app.exec_())
+

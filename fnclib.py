@@ -424,6 +424,7 @@ def getFncDict(folderPath, csinstance = "None"):
                 tmpfncObj = fncObj()
                 try:
                     fnc = fncFile.read()
+
                 except:
                     hjio.writelog('read fnc failed, fnc={}'.format(filePath))
                     continue

@@ -6,6 +6,7 @@ from commonDef import HexinIni
 import fnclib
 import hjio
 import temp
+from hjperf import cTimeBand
 
 
 
@@ -63,25 +64,53 @@ hxID2obj = {}
 hxName2obj = {}
 
 def init(folderpath):
+    timeBand = cTimeBand()
+    timeBand.addTimePoint()
     global baseDict
     baseDict = fnclib.getFncDict(folderpath, 'git_base')
-    fnclib.fncAllmapAddDict(baseDict)
-
-    global hexinIniBase
+    # fnclib.fncAllmapAddDict(baseDict)
+    timeBand.addTimePoint()
+    # global hexinIniBase
     extpath = folderpath.rsplit(os.path.sep, 1)[0]
     extHxinipath = fnclib.getDesignedFilepath('hexin.ini', extpath)
-    hexinIniBase = fnclib.hexinIniAnalysis(None, extHxinipath, 'git_base')
-    fnclib.hxidAllAddDict(hexinIniBase)
+    # hexinIniBase = fnclib.hexinIniAnalysis(None, extHxinipath, 'git_base')
+    # fnclib.hxidAllAddDict(hexinIniBase)
 
     global hxID2obj
     global hxName2obj
     hexinRes = fnclib.getHxiniDatadict(extHxinipath)
     hxID2obj = hexinRes[0]
     hxName2obj = hexinRes[1]
-
-
-    hjio.writelog("fnc data init successsfully!")
+    timeBand.addTimePoint()
+    # print(timeBand.getTimeBand())
+    hjio.writelog("fnc data init successsfully! timeband:{}".format(str(timeBand.getTimeBand())))
     return
+
+def baseDictInit(folderpath):
+    timeBand = cTimeBand()
+    timeBand.addTimePoint()
+    global baseDict
+    baseDict = fnclib.getFncDict(folderpath, 'git_base')
+    timeBand.addTimePoint()
+    hjio.writelog("fnc load complete! timeband:{}".format(str(timeBand.getTimeBand())))
+    return
+
+def hexiniConfInit(folderpath):
+    timeBand = cTimeBand()
+    timeBand.addTimePoint()
+    extpath = folderpath.rsplit(os.path.sep, 1)[0]
+    extHxinipath = fnclib.getDesignedFilepath('hexin.ini', extpath)
+    global hxID2obj
+    global hxName2obj
+    hexinRes = fnclib.getHxiniDatadict(extHxinipath)
+    hxID2obj = hexinRes[0]
+    hxName2obj = hexinRes[1]
+    timeBand.addTimePoint()
+    hjio.writelog("hexin.ini init complete! timeband:{}".format(str(timeBand.getTimeBand())))
+    return
+
+
+upperLetterSet = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'}
 
 def hexinUnitRef(str2find, retIDlist = False):
     if len(str2find) == 0:
@@ -91,8 +120,14 @@ def hexinUnitRef(str2find, retIDlist = False):
     str2find = str2find.upper()
     refNamelist= []
     for name in hxName2obj.keys():
-        if str2find.find(name) >= 0:
-            refNamelist.append(name)
+        headIndex = str2find.find(name)
+        if headIndex >= 0:
+            nameLen = len(name)
+
+            # 避免函数名匹配出错，字符串字串重复匹配问题，这里对系统函数做了检查
+            if ((headIndex-1 < 0) or (str2find[headIndex-1] not in upperLetterSet)) \
+                    and ((headIndex + nameLen >= len(str2find)) or (str2find[headIndex+nameLen] not in upperLetterSet)):
+                refNamelist.append(name)
 
     refIDlist = []
     if retIDlist:
@@ -188,6 +223,12 @@ def hexinSmName2Table(smName):
     else:
         return '计算指标'
 
+def getFncName(fobj):
+    if fobj.id in hxID2obj.keys():
+        return hxID2obj[fobj.id].name
+    else:
+        return fobj.getFilenamePrefix()
+
 def dataDictTableProc(path):
     # tableHead = ['']
     # lineTemp = '{id},{name},{descript},{fnctype},{market},{zqtype},' \
@@ -227,13 +268,14 @@ def dataDictTableProc(path):
         for fobj in baseDict[key]:
             if isHighFreqID(fobj.id) == False:
                 continue
+            fname = getFncName(fobj)
             refAnaRes = fnchexinUnitRefAna(fobj)
             periodRange = fobj.getStrPeriodRange()
             defaultPeriod = fobj.getDefaultPeriodItem()
             periodItem = fobj.getStrPeriodItem()
             line = [fobj.id,
+                    fname,
                     fobj.name,
-                    '', #含义
                     '指标',
                     '', #市场权限
                     '', #证券类型

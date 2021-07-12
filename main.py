@@ -13,6 +13,7 @@ import idfrequence
 
 import time
 import sys
+import threading
 
 MODE_DATA_DICT    = 0
 MODE_FNC_ANA      = 1
@@ -26,9 +27,9 @@ def main():
 
     # 日志初始化 必要
     hjio.init(setting.logpath)
-
+    hjio.writelog("PROCESS START")
     # 运行
-    runByMode(0)
+    runByMode(4)
 
     # 清空日志缓存，写文件
     hjio.clearbuf('PROCESS END')
@@ -60,14 +61,17 @@ def ModeDataDict():
     timeBand = cTimeBand()
     timeBand.addTimePoint()
 
-    fncData.init(setting.initPaht)
-    timeBand.addTimePoint()
+    thdFncLoad = threading.Thread(target=fncData.init, args=(setting.initPath,))
+    thdFncLoad.start()
+    # thdFncLoad = threading.Thread(target=fncData.baseDictInit, args=(setting.initPath,))
+    # thdFncLoad.start()
+    #
+    # thdHexinini = threading.Thread(target=fncData.hexiniConfInit, args=(setting.initPath,))
+    # thdHexinini.start()
 
-    # 数据字典exe
     fncDataDict.proc()
 
     # 打印处理时间信息
-    print(timeBand.getTimeBand())
     return
 
 def ModeFncAna():
@@ -107,7 +111,7 @@ def ModeReqFreqAna():
 
     hjio.writelog('PROCESS START')
 
-    fncData.init(setting.initPaht)
+    fncData.init(setting.initPath)
     timeBand.addTimePoint()
 
     #id 分析
@@ -124,7 +128,7 @@ def ModeReqFreqIDsearch(searchID = 0):
     timeBand = cTimeBand()
     timeBand.addTimePoint()
 
-    fncData.init(setting.initPaht)
+    fncData.init(setting.initPath)
     timeBand.addTimePoint()
 
     # id 分析
@@ -139,13 +143,13 @@ def ModeReqFreqIDsearch(searchID = 0):
     return
 
 def ModeDataDictExcel():
-    fncData.init(setting.initPaht)
+    fncData.init(setting.initPath)
     fncData.dataDictTableProc(setting.excelDict)
     return
 
 
 def ModeFncIDfind():
-    fncData.init(setting.initPaht)
+    fncData.init(setting.initPath)
     idlist = [2977,3124,68517,3121,3119,3120,3138,3141,3139,3140,68519,68518,3126,3127,3130,3134,3131,3135,68521,68520,68508,68509,68510,68511,68512,68513,68514,68515,3128,3129,3132,3136,3133,3137,68522,68523]
     for id in idlist:
         if id in fncData.baseDict.keys():
@@ -154,7 +158,7 @@ def ModeFncIDfind():
 
 # 查找hexin.ini中错误的命名
 def ModeHxiniNameCheck():
-    fncData.init(setting.initPaht)
+    fncData.init(setting.initPath)
     fobjdict = fncData.baseDict
     hxiniIDdict = fncData.hxID2obj
     hxiniNameDict = fncData.hxName2obj

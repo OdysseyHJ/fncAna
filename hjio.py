@@ -2,6 +2,7 @@
 import os
 import setting
 import csv
+import datetime
 
 iobuf = ''
 iobufLen = 10
@@ -62,7 +63,9 @@ def init(filepath):
 
 def writelog(strLoginfo):
     global iobuf
-    iobuf += (strLoginfo + '\n')
+    dtNow = datetime.datetime.now()
+    lineinfo = "{} {}\n".format(dtNow, strLoginfo)
+    iobuf += lineinfo
     if len(iobuf) >= iobufLen:
         clearbuf()
     return
