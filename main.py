@@ -29,7 +29,7 @@ def main():
     hjio.init(setting.logpath)
     hjio.writelog("PROCESS START")
     # 运行
-    runByMode(4)
+    runByMode(0)
 
     # 清空日志缓存，写文件
     hjio.clearbuf('PROCESS END')
