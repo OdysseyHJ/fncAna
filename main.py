@@ -10,6 +10,9 @@ import fncDataDict
 import hjqt
 import temp
 import idfrequence
+import historyLib
+import graphlib
+
 
 import time
 import sys
@@ -22,6 +25,7 @@ MODE_REQ_FREQ_ID_SEARCH = 3
 MODE_DATA_DICT_EXCEL = 4
 MODE_FNC_ID_FIND = 5
 MODE_HXINI_NAME_CHECK = 6
+MODE_HISTORY_DATA_ANA = 7
 
 def main():
 
@@ -29,7 +33,7 @@ def main():
     hjio.init(setting.logpath)
     hjio.writelog("PROCESS START")
     # 运行
-    runByMode(0)
+    runByMode(7)
 
     # 清空日志缓存，写文件
     hjio.clearbuf('PROCESS END')
@@ -50,6 +54,8 @@ def runByMode(modeType = 0):
         ModeFncIDfind()
     elif modeType == MODE_HXINI_NAME_CHECK:
         ModeHxiniNameCheck()
+    elif modeType == MODE_HISTORY_DATA_ANA:
+        ModeHistoryDataAna()
     else:
         errinfo = "wrong mode type:{}".format(modeType)
         print(errinfo)
@@ -184,6 +190,17 @@ def ModeHxiniNameCheck():
             print(name)
     return
 
+def ModeHistoryDataAna():
+    #历史数据处理
+    filelist = historyLib.getFileList(setting.history_data_path)
+    historyLib.history_data_proc(filelist)
+    historyLib.genCsv(setting.table_path)
+    historyLib.MarketDataInit()
+
+    #图表绘制
+    # graphlib.drawBarAll(setting.graph_bar_path)
+    graphlib.drawPlotAll(setting.graph_plot_path)
+    return
 
 if __name__ == '__main__':
     main()

@@ -12,9 +12,11 @@ slash = '\\'
 
 # home path
 # rootpath = r'H:\HJ_Docs\公式统计'
+
 # ths path
-rootpath = r'D:\HJ_EX_Docs\公式原始数据'
+# rootpath = r'D:\HJ_EX_Docs\公式原始数据'
 # rootpath = r'D:\HJ_EX_Docs\公式原始数据\新版本统计信息'
+rootpath = r'D:\HJ_EX_Docs\HQSERVER\HQSERVER-2630'
 
 
 def makepath(root, sub):
@@ -56,4 +58,10 @@ userReqPath = makepath(rootpath, r'用户请求录包')
 idRefAna = makepath(rootpath, r'UserReqAna.txt')
 idCountPath = makepath(rootpath, r'reqIDcount.csv')
 
-
+###################################################
+#          history data
+###################################################
+history_data_path = makepath(rootpath, r'\history_data\stat')
+table_path = makepath(rootpath, r'\table')
+graph_bar_path = makepath(rootpath, r'\graph\bar')
+graph_plot_path = makepath(rootpath, r'\graph\plot')

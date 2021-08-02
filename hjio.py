@@ -57,8 +57,6 @@ def dirCC(path):
 def init(filepath):
     global logpath
     logpath = filepath
-    print('logpath')
-    print(logpath)
 
 
 def writelog(strLoginfo):
