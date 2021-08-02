@@ -16,8 +16,8 @@ slash = '\\'
 # ths path
 # rootpath = r'D:\HJ_EX_Docs\公式原始数据'
 # rootpath = r'D:\HJ_EX_Docs\公式原始数据\新版本统计信息'
-rootpath = r'D:\HJ_EX_Docs\HQSERVER\HQSERVER-2630'
 
+rootpath = r'H:\HJ_Code\fncAna\history_data'
 
 def makepath(root, sub):
     pathSeq = (root, sub)
@@ -61,7 +61,7 @@ idCountPath = makepath(rootpath, r'reqIDcount.csv')
 ###################################################
 #          history data
 ###################################################
-history_data_path = makepath(rootpath, r'\history_data\stat')
+history_data_path = makepath(rootpath, r'\data\stat')
 table_path = makepath(rootpath, r'\table')
 graph_bar_path = makepath(rootpath, r'\graph\bar')
 graph_plot_path = makepath(rootpath, r'\graph\plot')

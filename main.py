@@ -12,7 +12,7 @@ import temp
 import idfrequence
 import historyLib
 import graphlib
-
+import hjdraw
 
 import time
 import sys
@@ -194,12 +194,15 @@ def ModeHistoryDataAna():
     #历史数据处理
     filelist = historyLib.getFileList(setting.history_data_path)
     historyLib.history_data_proc(filelist)
-    historyLib.genCsv(setting.table_path)
+    # historyLib.genCsv(setting.table_path)
     historyLib.MarketDataInit()
 
     #图表绘制
     # graphlib.drawBarAll(setting.graph_bar_path)
-    graphlib.drawPlotAll(setting.graph_plot_path)
+    # graphlib.drawPlotAll(setting.graph_plot_path)
+
+    #图表工具
+    hjdraw.init()
     return
 
 if __name__ == '__main__':

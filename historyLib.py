@@ -13,8 +13,8 @@ STAT_KEY_STOREAGE_CNT = 'storage_count'
 STAT_KEY_RECORD_CNT = 'record_count'
 
 statKeySet = {
-    STAT_KEY_MARKET,
-    STAT_KEY_FILE_TYPE,
+    # STAT_KEY_MARKET,
+    # STAT_KEY_FILE_TYPE,
     STAT_KEY_FIELD_CNT,
     STAT_KEY_FILE_CNT,
     STAT_KEY_STOREAGE_CNT,
@@ -75,6 +75,8 @@ datatypeSet = {
     DATA_FILE_HISPRE,
     DATA_FILE_HISAFTER,
 }
+
+dataTypeChn = {}
 
 #统计信息字典：
 # key (hostname) --- value (dict)
@@ -323,8 +325,10 @@ class CMarketDict:
         hostlist = []
         vallist = []
         if market not in self.MDH_Dict.keys():
+            print(market, self.MDH_Dict.keys())
             return ([],[])
         if datatype not in self.MDH_Dict[market].keys():
+            print(datatype, self.MDH_Dict[market].keys())
             return ([],[])
 
         datahandle = self.MDH_Dict[market][datatype]
@@ -339,7 +343,7 @@ class CMarketDict:
             elif field == STAT_KEY_RECORD_CNT:
                 value = datahandle[host].record_count
             hostdict[host] = value
-        print(hostdict)
+        # print(hostdict)
         sortedDict = sorted(hostdict.items(), key=lambda d: d[1], reverse=False)
 
         for host,val in sortedDict:
@@ -367,8 +371,8 @@ def MarketDataInit():
 
     siMarketDict.summaryDictInit()
     # print()
-    # for market in marketSet:
-    #     for datatype in datatypeSet:
+    # for market in siMarketDict.summaryDict.keys():
+    #     for datatype in siMarketDict.summaryDict[market].keys():
     #         print(market, datatype)
     #         siMarketDict.summaryDict[market][datatype].show()
     return

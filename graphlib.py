@@ -6,10 +6,9 @@ import historyLib
 
 
 def drawBarGraph(title, datatype='day', fieldtype='hostcount', savPath=''):
+    print(title, datatype, fieldtype)
     X, Y1 = historyLib.siMarketDict.getDatatypeFieldList(datatype, fieldtype)
-    # X, Y2 = historyLib.siMarketDict.getDatatypeFieldList(field=historyLib.STAT_KEY_FILE_CNT)
-    # X, Y3 = historyLib.siMarketDict.getDatatypeFieldList(field=historyLib.STAT_KEY_STOREAGE_CNT)
-    # X, Y4 = historyLib.siMarketDict.getDatatypeFieldList(field=historyLib.STAT_KEY_RECORD_CNT)
+
     width=1
     xpos = np.arange(0, len(X)*1.5, 1.5)
     if len(X) == 0:
@@ -18,8 +17,8 @@ def drawBarGraph(title, datatype='day', fieldtype='hostcount', savPath=''):
     fig, ax = plt.subplots(figsize=(10, 8))
     bars1 = plt.barh(xpos, Y1, align='center', height=width, alpha=0.9, label='Category A')
 
-    ax.set_yticks(xpos)  # 确定每个记号的位置
-    ax.set_yticklabels(X)  # 确定每个记号的内容
+    # ax.set_yticks(xpos)  # 确定每个记号的位置
+    # ax.set_yticklabels(X)  # 确定每个记号的内容
 
     plt.title(title)
 
@@ -68,18 +67,27 @@ def drawBarAll(path=''):
 def drawPlotAll(path=''):
     for market in historyLib.marketSet:
         for datatype in historyLib.datatypeSet:
-            drapPlotGraph('test', 'shase', 'day', historyLib.STAT_KEY_FILE_CNT)
+            drawPlotGraph('test', 'hk', 'day', historyLib.STAT_KEY_FIELD_CNT, True)
 
 
-
-def drapPlotGraph(title, market, datatype, field, savPath=''):
+def drawPlotGraph(title, market, datatype, field, abbrx=False, savPath=''):
+    # print(title, market, datatype, field, abbrx)
     X, Y = historyLib.siMarketDict.gethostFieldList(market, datatype, field)
-    print(X)
+    fig, ax = plt.subplots(figsize=(10, 8))
     plt.plot(X, Y)
 
-    plt.xticks(rotation=45)
-    plt.title(title)
+    xStep = 1
+    xpos = np.arange(0, len(X), xStep)
+    if abbrx:
+        xStep = len(X) // 20
+        if xStep < 1:
+            xStep = 1
+        print(xStep)
+        ax.set_xticks(xpos[::xStep])  # 确定每个记号的位置
+        ax.set_xticklabels(X[::xStep])  # 确定每个记号的内容
 
+    plt.xticks(rotation=90)
+    plt.title(title)
     plt.show()
 
     return
