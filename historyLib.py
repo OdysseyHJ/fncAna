@@ -21,9 +21,48 @@ statKeySet = {
     STAT_KEY_RECORD_CNT,
 }
 
+statKeyChn = {
+    # STAT_KEY_MARKET = '',
+    # STAT_KEY_FILE_TYPE = '',
+    STAT_KEY_FIELD_CNT : '表字段数',
+    STAT_KEY_FILE_CNT : '文件总数',
+    STAT_KEY_STOREAGE_CNT : '文件合计占用空间(KB)',
+    STAT_KEY_RECORD_CNT : '记录总数',
+}
+
+
 #市场定义
 # 历史数据处理时生成
 marketSet = set()
+
+marketChn = {
+'bankbond' : '银行间债券',
+ 'bats' : '美股BAT',
+ 'cffex' : '中金所',
+ 'europe' : '英股',
+ 'foreign' : '外汇',
+ 'fxindx' : '全球指数',
+ 'hk' : '港股',
+ 'hz' : '港股期货',
+ 'indx' : '旧版同花顺指数',
+ 'metal' : '贵金属',
+ 'newindx' : '同花顺指数',
+ 'nsdq' : '纳斯达克',
+ 'nymex' : '外期',
+ 'nyse' : '纽约',
+ 'options' : '上证期权',
+ 'quota' : '商品期货',
+ 'shase' : '上证',
+ 'shgold' : '上海黄金',
+ 'shhk' : '沪港通',
+ 'stb' : '三板',
+ 'swindx' : '申万指数',
+ 'szhk' : '深港通',
+ 'sznse' : '深证',
+ 'szoptions' : '深证期权',
+ 'zzindx' : '中证指数',
+ }
+
 
 #数据分类定义
 DATA_FILE_DAYK = "*.day"
@@ -76,7 +115,27 @@ datatypeSet = {
     DATA_FILE_HISAFTER,
 }
 
-dataTypeChn = {}
+datatypeChn = {
+    starTrans[DATA_FILE_DAYK] : '日K线数据',
+    starTrans[DATA_FILE_MINK] : '分钟K线数据',
+    starTrans[DATA_FILE_MIN5K] : '5分钟K线数据',
+    starTrans[DATA_FILE_EXT] : '额外周期数据',
+    starTrans[DATA_FILE_LATEST_REAL] : '最新交易日实时数据',
+    DATA_FILE_HISNOWS : '股票快照数据',
+    DATA_FILE_HISNOWI : '指数快照数据',
+    DATA_FILE_HISTRACES : '股票明细数据',
+    DATA_FILE_HISTRACEI : '指数明细数据',
+    DATA_FILE_HISMINUTES : '股票分时数据',
+    DATA_FILE_HISMINUTEI : '指数分时数据',
+    DATA_FILE_HISCLOSE : '收盘集合竞价明细数据',
+    DATA_FILE_HISTICKS : '逐笔成交数据',
+    DATA_FILE_HISORDERS : '逐笔委托数据',
+    DATA_FILE_HISBORDERS : '委买队列数据',
+    DATA_FILE_HISSORDERS : '委卖队列数据',
+    DATA_FILE_HISOPEN : '开盘集合竞价明细数据',
+    DATA_FILE_HISPRE : '盘前明细数据',
+    DATA_FILE_HISAFTER : '盘后明细数据',
+}
 
 #统计信息字典：
 # key (hostname) --- value (dict)

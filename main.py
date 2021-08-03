@@ -196,6 +196,7 @@ def ModeHistoryDataAna():
     historyLib.history_data_proc(filelist)
     # historyLib.genCsv(setting.table_path)
     historyLib.MarketDataInit()
+    # print(sorted(historyLib.marketSet))
 
     #图表绘制
     # graphlib.drawBarAll(setting.graph_bar_path)

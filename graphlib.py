@@ -6,9 +6,8 @@ import historyLib
 
 
 def drawBarGraph(title, datatype='day', fieldtype='hostcount', savPath=''):
-    print(title, datatype, fieldtype)
+    # print(title, datatype, fieldtype)
     X, Y1 = historyLib.siMarketDict.getDatatypeFieldList(datatype, fieldtype)
-
     width=1
     xpos = np.arange(0, len(X)*1.5, 1.5)
     if len(X) == 0:
@@ -17,8 +16,8 @@ def drawBarGraph(title, datatype='day', fieldtype='hostcount', savPath=''):
     fig, ax = plt.subplots(figsize=(10, 8))
     bars1 = plt.barh(xpos, Y1, align='center', height=width, alpha=0.9, label='Category A')
 
-    # ax.set_yticks(xpos)  # 确定每个记号的位置
-    # ax.set_yticklabels(X)  # 确定每个记号的内容
+    ax.set_yticks(xpos)  # 确定每个记号的位置
+    ax.set_yticklabels(X)  # 确定每个记号的内容
 
     plt.title(title)
 
